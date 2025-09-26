@@ -61,15 +61,23 @@ app.post('/login', (req, res) => {
     }
 })
 
-app.get("/home", isAuth, (req, res) => {
+app.get("/admin", isAdmin, (req, res) => {
     // leeriamos el usuario de la cookie
     // consulta en bbdd del usuario
     // se lo enviamos por parametro al render
-    res.render("home")
+    res.render("admin", { user: req.cookies.user });
+})
+
+app.get("/user", isUser, (req, res) => {
+    // leeriamos el usuario de la cookie
+    // consulta en bbdd del usuario
+    // se lo enviamos por parametro al render
+    res.render("user", { user: req.cookies.user });
 })
 
 app.get("/logout", (req, res) => {
     res.clearCookie("user");
+    res.clearCookie("role");
     res.redirect("login");
 })
 
