@@ -49,7 +49,13 @@ app.post('/login', (req, res) => {
     if (user == "admin" && password == "1234") {
         console.log("usuario y contraseña correcta")
         res.cookie("user", user); // options - js no secure si
-        res.redirect("home");
+        res.cookie("role", "admin"); // options - js no secure si
+        res.redirect("admin");
+    } else if (user == "pepe" && password == "5678") {
+        console.log("usuario y contraseña correcta")
+        res.cookie("user", user); // options - js no secure si
+        res.cookie("role", "user"); // options - js no secure si
+        res.redirect("user");
     } else {
         res.status(401).redirect("login")
     }
