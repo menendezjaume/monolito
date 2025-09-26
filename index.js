@@ -16,7 +16,14 @@ app.get('/', (req, res) => {
 })
 
 isAdmin = (req, res, next) => {
-    if (req.cookies && req.cookies.user){
+    if (req.cookies && req.cookies.user && req.cookies.role == "admin"){
+        return next();
+    }
+    res.redirect("/login");
+}
+
+isUser = (req, res, next) => {
+    if (req.cookies && req.cookies.user && req.cookies.role == "user"){
         return next();
     }
     res.redirect("/login");
