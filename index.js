@@ -11,7 +11,7 @@ app.use(cookieParser());
 
 app.get('/', (req, res) => {
     // sql
-    res.render('index', { title: "Mi super página", name: "Nombre" });
+    res.render('index', { title: "Mi super página" });
 
 })
 
@@ -19,12 +19,20 @@ isAdmin = (req, res, next) => {
     if (req.cookies && req.cookies.user && req.cookies.role == "admin"){
         return next();
     }
+    // if is user send to user page
+    if (req.cookies && req.cookies.user && req.cookies.role == "user"){
+        return res.redirect("/user");
+    }   
     res.redirect("/login");
 }
 
 isUser = (req, res, next) => {
     if (req.cookies && req.cookies.user && req.cookies.role == "user"){
         return next();
+    }
+    // if is admin send to admin page
+    if (req.cookies && req.cookies.user && req.cookies.role == "admin"){
+        return res.redirect("/admin");
     }
     res.redirect("/login");
 }
@@ -38,7 +46,7 @@ isAuth = (req, res, next) => {
 
 // gestion de la vista
 app.get('/login',  (req, res, next) => {
-    res.render('login');
+    res.render('login', { title: "Login" });
 })
 
 // gestion de los parámetros post
@@ -69,9 +77,6 @@ app.get("/admin", isAdmin, (req, res) => {
 })
 
 app.get("/user", isUser, (req, res) => {
-    // leeriamos el usuario de la cookie
-    // consulta en bbdd del usuario
-    // se lo enviamos por parametro al render
     res.render("user", { user: req.cookies.user });
 })
 
