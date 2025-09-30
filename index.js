@@ -1,7 +1,12 @@
 const express = require('express')
 const cookieParser = require('cookie-parser')
+const Database = require('better-sqlite3');
+const bcrypt = require('bcrypt');
+
 const app = express()
 const port = 3000
+
+const db = new Database('database.sqlite');
 
 app.set('view engine', 'ejs');
 
@@ -16,7 +21,7 @@ app.get('/', (req, res) => {
 })
 
 isAdmin = (req, res, next) => {
-    if (req.cookies && req.cookies.user && req.cookies.role == "admin"){
+    if (req.cookies && req.cookies.user && req.cookies.role == "superinvestigador"){
         return next();
     }
     // if is user send to user page
@@ -50,22 +55,21 @@ app.get('/login',  (req, res, next) => {
 })
 
 // gestion de los parámetros post
-app.post('/login', (req, res) => {
-    const { user, password } = req.body;
-    console.log(req.body);
+app.post('/login', async (req, res) => {
+    const { user, password } = req.body; // cliente
 
-    if (user == "admin" && password == "1234") {
+    const fila = db.prepare('SELECT * FROM users WHERE username = ?')
+    const userdb = fila.get(user);
+
+    const validPassword = await bcrypt.compare(password, userdb.password);
+    
+    if (validPassword) {
         console.log("usuario y contraseña correcta")
         res.cookie("user", user); // options - js no secure si
-        res.cookie("role", "admin"); // options - js no secure si
-        res.redirect("admin");
-    } else if (user == "pepe" && password == "5678") {
-        console.log("usuario y contraseña correcta")
-        res.cookie("user", user); // options - js no secure si
-        res.cookie("role", "user"); // options - js no secure si
-        res.redirect("user");
+        res.cookie("role", userdb.role); // options - js no secure si
+        res.redirect(userdb.role);
     } else {
-        res.status(401).redirect("login")
+        res.status(401).redirect("login");
     }
 })
 
