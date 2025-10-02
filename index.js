@@ -1,5 +1,12 @@
 const express = require('express')
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+
+// base de datos
+const Database = require('better-sqlite3');
+const db = new Database('./database.sqlite'); // crea el archivo si no existe
+// para las contraseñas
+const bcrypt = require('bcrypt');
+
 const app = express()
 const port = 3000
 
@@ -37,16 +44,34 @@ app.get('/login',  (req, res, next) => {
 // gestion de los parámetros post
 app.post('/login', (req, res) => {
     const { user, password } = req.body;
-    console.log(req.body);
 
-    if (user == "admin" && password == "1234") {
-        console.log("usuario y contraseña correcta")
-        res.cookie("user", user); // options - js no secure si
-        res.redirect("home");
-    } else {
-        res.status(401).redirect("login")
+    try {
+        // Buscar el usuario en la base de datos
+        const row = db.prepare('SELECT * FROM users WHERE username = ?').get(user);
+
+        if (!row) {
+            console.log("Usuario no encontrado");
+            return res.status(401).redirect("login");
+        }
+
+        // Comparar contraseña introducida con la guardada (hash bcrypt)
+        const passwordMatch = bcrypt.compareSync(password, row.password);
+
+        if (passwordMatch) {
+            console.log(`Usuario ${row.username} autenticado correctamente (rol: ${row.role})`);
+            res.cookie("user", row.username, { httpOnly: true });
+            res.cookie("role", row.role, { httpOnly: true });
+            return res.redirect("home");
+        } else {
+            console.log("Contraseña incorrecta");
+            return res.status(401).redirect("login");
+        }
+
+    } catch (err) {
+        console.error("Error en login:", err.message);
+        return res.status(500).send("Error interno del servidor");
     }
-})
+});
 
 app.get("/home", isAuth, (req, res) => {
     // leeriamos el usuario de la cookie
