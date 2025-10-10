@@ -1,6 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const { Client } = require('pg');
+const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 
 const app = express();
@@ -9,7 +9,7 @@ const port = 3000;
 // importar la configuración de la base de datos
 require('dotenv').config();
 
-const client = new Client({
+const pool = new Pool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     database: process.env.DB_NAME,
@@ -31,11 +31,7 @@ app.get('/', (req, res) => {
 });
 
 const isAdmin = (req, res, next) => {
-    if (
-        req.cookies &&
-        req.cookies.user &&
-        req.cookies.role == 'superinvestigador'
-    ) {
+    if (req.cookies && req.cookies.user && req.cookies.role == 'admin') {
         return next();
     }
     // if is user send to user page
@@ -67,8 +63,7 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
     const { user, password } = req.body; // cliente
 
-    await client.connect();
-    const resultado = await client.query(
+    const resultado = await pool.query(
         'SELECT * FROM users WHERE username = $1',
         [user],
     );
@@ -85,7 +80,6 @@ app.post('/login', async (req, res) => {
     } else {
         res.status(401).redirect('login');
     }
-    await client.end();
 });
 
 app.get('/admin', isAdmin, (req, res) => {
