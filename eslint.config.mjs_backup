@@ -1,0 +1,38 @@
+import js from '@eslint/js';
+import globals from 'globals';
+import { defineConfig } from 'eslint/config';
+import pluginPrettier from 'eslint-plugin-prettier';
+import { parse } from 'dotenv';
+import e from 'express';
+export default defineConfig([
+  {
+    files: ['**/*.js'],
+    languageOptions: { sourceType: 'commonjs' },
+    plugins: { prettier: pluginPrettier },
+    rules: {
+      semi: ['error', 'always'],
+      quotes: ['error', 'single'],
+      'prettier/prettier': 'error',
+    },
+  },
+  {
+    languageOptions: { 
+      sourceType: 'script',
+      parserOptions: { 
+        ecmaVersion: 'latest'
+      },
+      globals: { 
+        ...globals.node, 
+        ...globals.es2021 
+      }
+    },
+    rules: {
+      'no-undef': 'error',
+      'no-unused-vars': ['warn', { args: 'none' }],
+      'no-console': 'off',
+      semi: ['error', 'always'],
+      quotes: ['error', 'single'],
+      'prettier/prettier': 'error',
+    },
+  }
+]);
