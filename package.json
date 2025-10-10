@@ -4,13 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run lint:fix && npm run format",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "prepare": "husky",
-    "lint-staged": {
-"*.js": ["eslint --fix", "prettier --write"]
-}
+    "lint:fix": "eslint . --ext .js --fix",
+    "format": "prettier --write ."
   },
   "author": "Miki",
   "license": "MIT",
