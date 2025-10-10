@@ -1,18 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <form action="/login" method="post">
-        <label for="user">Nombre:</label>
-        <input type="text" id="user" name="user">
+<%- include('partials/header') %>
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <form action="/login" method="POST" class="p-4 border rounded" style="min-width: 300px;">
+        <h2>Login</h2>
+        <div class="form-group">
+            <label for="user">User</label>
+            <input type="text" class="form-control" id="user" placeholder="Enter user" name="user">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Password" name="password">
+        </div>
         <br>
-        <label for="password">Contraseña:</label>
-        <input type="password" name="password" id="password">
-        <input type="submit" value="Enviar">
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-</body>
-</html>
+</div>
+
+<%- include('partials/footer') %>
