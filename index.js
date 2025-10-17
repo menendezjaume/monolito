@@ -88,7 +88,7 @@ app.get('/admin', isAdmin, (req, res) => {
     // se lo enviamos por parametro al render
     res.render('admin', {
         user: req.cookies.user,
-        title: 'Zona admin',
+        title: 'Zona admin privada',
     });
 });
 
