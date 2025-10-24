@@ -119,7 +119,8 @@ jobs:
                   TAGS_BBDD: ${{ steps.meta-bbdd.outputs.tags }}
               # This step uses the identity token to provision an ephemeral certificate
               # against the sigstore community Fulcio instance.
-              run: echo "Signing app image..."
-              run: echo "${TAGS_APP}" | xargs -I {} cosign sign --yes {}@${DIGEST_APP}
-              run: echo "Signing bbdd image..."
-              run: echo "${TAGS_BBDD}" | xargs -I {} cosign sign --yes {}@${DIGEST_BBDD}
+              run: |
+                echo "Signing app image..."
+                echo "${TAGS_APP}" | xargs -I {} cosign sign --yes {}@${DIGEST_APP}
+                echo "Signing bbdd image..."
+                echo "${TAGS_BBDD}" | xargs -I {} cosign sign --yes {}@${DIGEST_BBDD}
