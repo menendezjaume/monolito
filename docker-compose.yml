@@ -6,7 +6,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - backend
+      - backend_1
     restart: unless-stopped
 
   # capa de aplicacion
@@ -14,17 +14,41 @@ services:
     build: ./app/.
     container_name: app_node
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - DB_HOST=app_bbdd
     networks:
-      - backend
+      - backend_1
+    depends_on:
+      - bbdd
+    restart: unless-stopped
+  bbdd_2:
+    build: ./bbdd/.
+    container_name: app_bbdd_2
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend_2
+    restart: unless-stopped
+
+  # capa de aplicacion
+  app_2:
+    build: ./app/.
+    container_name: app_node_2
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=app_bbdd_2
+    networks:
+      - backend_2
     depends_on:
       - bbdd
     restart: unless-stopped
 
 networks:
-  backend:
+  backend_1:
+    driver: bridge
+  backend_2:
     driver: bridge
 
 volumes:
