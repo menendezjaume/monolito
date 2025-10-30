@@ -1,0 +1,31 @@
+services:
+  # capa de bbdd
+  bbdd:
+    build: ./bbdd/.
+    container_name: app_bbdd
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    restart: unless-stopped
+
+  # capa de aplicacion
+  app:
+    build: ./app/.
+    container_name: app_node
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=app_bbdd
+    networks:
+      - backend
+    depends_on:
+      - bbdd
+    restart: unless-stopped
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
