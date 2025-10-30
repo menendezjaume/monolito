@@ -60,11 +60,11 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', async (req, res) => {
-    const { user, password } = req.body; // cliente       
+    const { user, password } = req.body; // cliente
     const hashedPassword = await bcrypt.hash(password, 10);
     await pool.query(
         'INSERT INTO users (username, password, role) VALUES ($1, $2, $3)',
-        [user, hashedPassword, "user"],
+        [user, hashedPassword, 'user'],
     );
     res.redirect('/login');
 });
@@ -93,12 +93,11 @@ app.post('/login', async (req, res) => {
         console.log('usuario no existe');
         return res.status(401).redirect('login');
     }
-    
+
     console.log('usuario existe');
-    console.log('userdb.username', userdb.username);    
+    console.log('userdb.username', userdb.username);
     console.log('userdb.password', userdb.password);
     console.log('userdb.role', userdb.role);
-
 
     const validPassword = await bcrypt.compare(password, userdb.password);
 
