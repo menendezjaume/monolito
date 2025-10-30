@@ -30,3 +30,45 @@ docker run -d --network mi_red --name mi_base_de_datos app_bbdd:1
 ```
 docker run -d -P --network mi_red --env DB_HOST=mi_base_de_datos app_node:1
 ```
+
+Pasos:
+
+Crear el volume:
+```
+docker volume create datos_postgres
+```
+
+Build de imagen de bases de datos:
+```
+cd bbdd
+docker build -t app_postgres .
+```
+
+Build de imagen de aplicación:
+
+```
+cd app
+docker build -t app_node .
+```
+
+Run de imagen de bbdd 1:
+
+```
+docker run -d --network mi_red -v datos_postgres:/var/lib/postgresql/data --name "contenedor_postgres_1" app_postgres
+```
+
+Run de imagen de bbdd 2:
+
+```
+docker run -d --network mi_red2 -v datos_postgres:/var/lib/postgresql/data --name "contenedor_postgres_2" app_postgres
+```
+
+Run de la imagen de app 1:
+```
+docker run -d -P --network mi_red --env DB_HOST="contenedor_postgres_1" --name "contenedor_app_1" app_node
+```
+
+Run de la imagen de app 2:
+```
+docker run -d -P --network mi_red2 --env DB_HOST="contenedor_postgres_2" --name "contenedor_app_2" app_node
+```

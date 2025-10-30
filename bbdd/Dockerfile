@@ -15,6 +15,7 @@ RUN initdb -D /var/lib/postgresql/data && \
     echo "listen_addresses='*'" >> /var/lib/postgresql/data/postgresql.conf && \
     pg_ctl stop -D /var/lib/postgresql/data
 
+VOLUME [ "/var/lib/postgresql/data" ]
 
 USER root
 
