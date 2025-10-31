@@ -23,6 +23,30 @@ app.use(express.urlencoded());
 app.use(express.json());
 app.use(cookieParser());
 
+function initDb() {
+    pool.connect((err) => {
+        if (err) {
+            console.error('Error connecting to the database', err);
+        } else {
+            console.log('Connected to the database');
+        }
+    });
+    try {
+        // create users table if not exists
+        pool.query(
+            `CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        role VARCHAR(20) NOT NULL
+    )`,
+        );
+        console.log('Users table created or already exists');
+    } catch (error) {
+        console.error('Error initializing database', error);
+    }
+};
+
 app.get('/', (req, res) => {
     // sql
     res.render('index', {
@@ -134,6 +158,8 @@ app.get('/logout', (req, res) => {
     res.clearCookie('role');
     res.redirect('login');
 });
+
+initDb();
 
 app.listen(port, () => {
     console.log(`Example app listening on port http://localhost:${port}`);

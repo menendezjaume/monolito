@@ -1,0 +1,36 @@
+services:
+  backend:
+    build: ./2_backend/.
+    container_name: backend
+    networks:
+      - red_1
+    environment:
+      - DB_HOST=db # aquí ponemos el nombre del contenedor de bbdd
+      - DB_PORT=5432
+      - DB_NAME=bd_monolito
+      - DB_USER=usuario
+      - DB_PASSWORD=123456
+    ports:
+      - "1234:3000"
+    depends_on:
+      - db # tenemos que poner el nombre del servicio
+
+  db:
+    image: postgres:17-alpine
+    container_name: db
+    environment:
+      - POSTGRES_USER=usuario
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=bd_monolito
+    networks:
+      - red_1
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  red_1:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
