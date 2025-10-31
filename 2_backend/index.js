@@ -45,7 +45,7 @@ function initDb() {
     } catch (error) {
         console.error('Error initializing database', error);
     }
-};
+}
 
 app.get('/', (req, res) => {
     // sql
