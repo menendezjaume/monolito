@@ -1,55 +1,51 @@
 services:
-  # capa de bbdd
-  bbdd:
-    build: ./bbdd/.
-    container_name: app_bbdd
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - backend_1
-    restart: unless-stopped
-
-  # capa de aplicacion
-  app:
+  app_1:
     build: ./app/.
-    container_name: app_node
-    ports:
-      - "3001:3000"
+    container_name: nombre_app_1
+    networks:
+      - red_1
     environment:
-      - DB_HOST=app_bbdd
-    networks:
-      - backend_1
+      - DB_HOST=nombre_bbdd_1 # aquí ponemos el nombre del contenedor de bbdd
+    ports:
+      - "1234:3000"
     depends_on:
-      - bbdd
-    restart: unless-stopped
-  bbdd_2:
+      - bbdd_1 # tenemos que poner el nombre del servicio
+    
+  bbdd_1:
     build: ./bbdd/.
-    container_name: app_bbdd_2
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    container_name: nombre_bbdd_1
     networks:
-      - backend_2
-    restart: unless-stopped
+      - red_1
+    volumes:
+      - datos_postgres:/var/lib/postgresql/data
 
-  # capa de aplicacion
   app_2:
     build: ./app/.
-    container_name: app_node_2
-    ports:
-      - "3000:3000"
-    environment:
-      - DB_HOST=app_bbdd_2
+    container_name: nombre_app_2
     networks:
-      - backend_2
+      - red_2
+    environment:
+      - DB_HOST=nombre_bbdd_2 # aquí ponemos el nombre del contenedor
+    ports:
+      - "1235:3000"
     depends_on:
-      - bbdd
-    restart: unless-stopped
+      - bbdd_2 # tenemos que poner el nombre del servicio
 
+  bbdd_2:
+    build: ./bbdd/.
+    container_name: nombre_bbdd_2
+    networks:
+      - red_2
+    volumes:
+      - datos_postgres:/var/lib/postgresql/data
+  
 networks:
-  backend_1:
+  red_1:
     driver: bridge
-  backend_2:
+
+  red_2:
     driver: bridge
 
 volumes:
-  postgres_data:
+  datos_postgres:
+    driver: local
