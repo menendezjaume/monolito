@@ -1,4 +1,11 @@
 services:
+  frontend:
+    build: ./1_frontend/.
+    container_name: frontend
+    ports:
+      - "4201:4201"
+    depends_on:
+      - backend # tenemos que poner el nombre del servicio  
   backend:
     build: ./2_backend/.
     container_name: backend
@@ -13,7 +20,8 @@ services:
     ports:
       - "1234:3000"
     depends_on:
-      - db # tenemos que poner el nombre del servicio
+      db: # tenemos que poner el nombre del servicio
+        condition: service_healthy
 
   db:
     image: postgres:17-alpine
@@ -26,6 +34,12 @@ services:
       - red_1
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U usuario -d bd_monolito"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
 networks:
   red_1:
