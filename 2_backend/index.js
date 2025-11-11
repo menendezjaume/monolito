@@ -59,10 +59,10 @@ async function initDb() {
         const createUser = async (username, password, role) => {
             const hashedPassword = await bcrypt.hash(password, 10);
             await pool.query(
-            `INSERT INTO users (username, password, role)
+                `INSERT INTO users (username, password, role)
             VALUES ($1, $2, $3)
             ON CONFLICT (username) DO NOTHING`,
-            [username, hashedPassword, role],
+                [username, hashedPassword, role],
             );
             console.log(`Default user "${username}" created or already exists`);
         };
@@ -71,28 +71,45 @@ async function initDb() {
         // create post by user "pepe" if not exists
         const createPost = async (id, imageUrl, content, username) => {
             const userResult = await pool.query(
-                `SELECT id FROM users WHERE username = $1`,
+                'SELECT id FROM users WHERE username = $1',
                 [username],
             );
             if (userResult.rows.length === 0) {
-                console.log(`User "${username}" does not exist. Cannot create post.`);
+                console.log(
+                    `User "${username}" does not exist. Cannot create post.`,
+                );
                 return;
             }
             const userId = userResult.rows[0].id;
             await pool.query(
-            `INSERT INTO posts (id, image_url, content, user_id)
+                `INSERT INTO posts (id, image_url, content, user_id)
             VALUES ($1, $2, $3, $4)
             ON CONFLICT (id) DO NOTHING`,
-            [id, imageUrl, content, userId],
+                [id, imageUrl, content, userId],
             );
             console.log('Post created or already exists');
         };
         // create a post
-        await createPost(1, Picsum.url(), 'Este es el contenido del primer post.', 'pepe');
+        await createPost(
+            1,
+            Picsum.url(),
+            'Este es el contenido del primer post.',
+            'pepe',
+        );
         // create another post
-        await createPost(2, Picsum.url(), 'Este es el contenido del segundo post.', 'pepe');
+        await createPost(
+            2,
+            Picsum.url(),
+            'Este es el contenido del segundo post.',
+            'pepe',
+        );
         // create a third post
-        await createPost(3, Picsum.url(), 'Este es el contenido del tercer post.', 'pepe');
+        await createPost(
+            3,
+            Picsum.url(),
+            'Este es el contenido del tercer post.',
+            'pepe',
+        );
     } catch (error) {
         console.error('Error initializing database', error);
     }
