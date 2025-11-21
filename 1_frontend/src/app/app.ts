@@ -1,31 +1,23 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { RestApiService } from './services/rest-api.service';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CommonModule, MatCardModule, MatButtonModule, MatIconModule],
+  imports: [RouterOutlet, RouterLink, CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App implements OnInit {
+export class App {
   protected readonly title = signal('frontend');
+  protected readonly auth = inject(RestApiService);
+  protected readonly router = inject(Router);
 
-  posts: any[] = [];
 
-  constructor(private api: RestApiService) { }
-
-  ngOnInit() {
-    this.loadPosts();
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/home']);
   }
 
-  loadPosts() {
-    this.api.getPosts().subscribe((data) => {
-      this.posts = data;
-    });
-  }
 }

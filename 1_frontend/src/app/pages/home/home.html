@@ -1,0 +1,6 @@
+<div class="centered-column-container">
+    <div *ngFor="let post of posts">
+        <img [src]="post.image_url" [alt]="post.username">
+        <p><strong>{{ post.username }}</strong>: {{ post.content }}</p>
+    </div>
+</div>

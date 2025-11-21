@@ -1,29 +1,14 @@
-<main class="main">
-  <div class="centered-column-container">
+<!-- encabezado comun a todas -->
+<nav class="navbar">
+  <a routerLink="/">Home</a>
+  <a *ngIf="!auth.isLoggedIn()" routerLink="/login">Login</a>
+  <a *ngIf="auth.isLoggedIn()" routerLink="/profile">Profile</a>
+  <a *ngIf="auth.isLoggedIn()" href="#" (click)="logout();">Logout</a>
+</nav>
 
-      <mat-card *ngFor="let post of posts" class="spacing-16" appearance="outlined">
-        <mat-card-header>
-          <img mat-card-avatar [src]="post.image_url" [alt]="post.username">
-          <mat-card-title>{{ post.username }}</mat-card-title>
-          <!-- <mat-card-subtitle>Dog Breed</mat-card-subtitle> -->
-        </mat-card-header>
-        <img mat-card-image [src]="post.image_url" [alt]="post.content">
+<router-outlet /><!-- Aquí se renderizan las páginas según la ruta -->
 
-        <mat-card-actions>
-          <button matButton>
-            <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="local_fire_department"></mat-icon>
-          </button>
-          <button matButton>
-            <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="mail"></mat-icon>
-          </button>
-        </mat-card-actions>
-        <mat-card-content>
-            <p><strong>{{ post.username }}</strong>: {{ post.content }}</p>
-        </mat-card-content>
-      </mat-card>
-
-    </div>
-</main>
-
-
-<router-outlet />
+<!-- pie de página comun a todas -->
+<footer class="footer">
+  <p>© 2024 Mi Aplicación Angular</p>
+</footer>

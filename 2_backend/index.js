@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 // picsum-photos
 const { Picsum } = require('picsum-photos');
 
@@ -19,7 +20,32 @@ const pool = new Pool({
     password: process.env.DB_PASSWORD,
 });
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+
+const JWT_SECRET = 'patata-secreta';
+
+function verifyToken(req, res, next) {
+    // capturamos el token del header Authorization
+    const authHeader = req.headers['authorization'];
+    // el token está en el formato "Bearer <token>"
+    // por lo que hay que partir el string con split
+    const token = authHeader && authHeader.split(' ')[1];
+    // si no hay token, devolver error 401
+    if (!token) {
+        return res.sendStatus(401);
+    }
+    // verificamos el token
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.sendStatus(403);
+        }
+        // inyectamos el usuario en la request
+        req.user = user;
+        next();
+    });
+}
 
 async function initDb() {
     try {
@@ -109,6 +135,41 @@ async function initDb() {
     }
 }
 
+app.post('/login', (req, res) => {
+    console.log('Login endpoint');
+    const { username, password } = req.body;
+
+    pool.query('SELECT * FROM users WHERE username = $1', [username])
+        .then(async (result) => {
+            // si la longitud de result.rows es 0, el usuario no existe
+            if (result.rows.length === 0) {
+                return res.status(401).json({ message: 'Invalid credentials' });
+            }
+            const user = result.rows[0];
+            const passwordMatch = await bcrypt.compare(password, user.password);
+            // si la contraseña no coincide, devolver error
+            if (!passwordMatch) {
+                return res.status(401).json({ message: 'Invalid credentials' });
+            }
+            // generamos el token JWT
+            const token = jwt.sign(
+                { id: user.id, username: user.username, role: user.role },
+                JWT_SECRET,
+                { expiresIn: '24h' },
+            );
+            // lo devolvemos al cliente
+            res.json({ token });
+        })
+        .catch((error) => {
+            console.error('Error during login', error);
+            res.status(500).json({ message: 'Internal server error' });
+        });
+});
+
+app.get('/profile', verifyToken, (req, res) => {
+    res.json({ message: 'This is a protected profile route', user: req.user });
+});
+
 // public get posts
 app.get('/posts', async (req, res) => {
     const resultado = await pool.query(
@@ -119,6 +180,7 @@ app.get('/posts', async (req, res) => {
     const posts = resultado.rows;
     res.json(posts);
 });
+
 
 initDb();
 
